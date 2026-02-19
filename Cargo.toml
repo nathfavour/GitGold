@@ -1,11 +1,11 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/gitcoin-core",
-    "crates/gitcoin-crypto",
-    "crates/gitcoin-storage",
-    "crates/gitcoin-ledger",
-    "crates/gitcoin-challenge",
+    "crates/GitGold-core",
+    "crates/GitGold-crypto",
+    "crates/GitGold-storage",
+    "crates/GitGold-ledger",
+    "crates/GitGold-challenge",
 ]
 
 [workspace.dependencies]
@@ -25,15 +25,15 @@ proptest = "1.4"
 
 # Root package for integration tests
 [package]
-name = "gitcoin"
+name = "GitGold"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-gitcoin-core = { path = "crates/gitcoin-core" }
-gitcoin-crypto = { path = "crates/gitcoin-crypto" }
-gitcoin-storage = { path = "crates/gitcoin-storage" }
-gitcoin-ledger = { path = "crates/gitcoin-ledger" }
-gitcoin-challenge = { path = "crates/gitcoin-challenge" }
+GitGold-core = { path = "crates/GitGold-core" }
+GitGold-crypto = { path = "crates/GitGold-crypto" }
+GitGold-storage = { path = "crates/GitGold-storage" }
+GitGold-ledger = { path = "crates/GitGold-ledger" }
+GitGold-challenge = { path = "crates/GitGold-challenge" }
 serde_json = { workspace = true }
 hex = { workspace = true }
