@@ -1,0 +1,16 @@
+[package]
+name = "gitcoin-challenge"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+gitcoin-core = { path = "../gitcoin-core" }
+gitcoin-crypto = { path = "../gitcoin-crypto" }
+gitcoin-storage = { path = "../gitcoin-storage" }
+gitcoin-ledger = { path = "../gitcoin-ledger" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+uuid = { workspace = true }
+rand = { workspace = true }
+chrono = { workspace = true }
+hex = { workspace = true }
