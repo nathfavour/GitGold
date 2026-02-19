@@ -1,10 +1,10 @@
-# GitCoin
+# GitGold
 
 A decentralized peer-to-peer network for Git repository storage where nodes earn cryptocurrency for reliably storing and serving repository fragments. Users pay network fees proportional to storage and bandwidth consumption, while storage nodes prove data availability through cryptographic challenges. Repositories are split using Shamir Secret Sharing so they remain reconstructable even when nodes go offline.
 
 This repository contains the **core library (v1.0)** — the cryptographic, storage, ledger, and challenge primitives that underpin the protocol. Networking (libp2p), Git integration, and the node daemon are planned for future phases.
 
-See the full [whitepaper](GitCoin.txt) for the complete protocol specification and economic model.
+See the full [whitepaper](GitGold.txt) for the complete protocol specification and economic model.
 
 ---
 
@@ -12,11 +12,11 @@ See the full [whitepaper](GitCoin.txt) for the complete protocol specification a
 
 - [Architecture](#architecture)
 - [Crates](#crates)
-  - [gitcoin-core](#gitcoin-core)
-  - [gitcoin-crypto](#gitcoin-crypto)
-  - [gitcoin-storage](#gitcoin-storage)
-  - [gitcoin-ledger](#gitcoin-ledger)
-  - [gitcoin-challenge](#gitcoin-challenge)
+  - [GitGold-core](#GitGold-core)
+  - [GitGold-crypto](#GitGold-crypto)
+  - [GitGold-storage](#GitGold-storage)
+  - [GitGold-ledger](#GitGold-ledger)
+  - [GitGold-challenge](#GitGold-challenge)
 - [How It Works](#how-it-works)
   - [Repository Fragmentation](#repository-fragmentation)
   - [Shamir Secret Sharing](#shamir-secret-sharing)
@@ -39,16 +39,16 @@ See the full [whitepaper](GitCoin.txt) for the complete protocol specification a
 
 ## Architecture
 
-GitCoin's core library is organized as a Cargo workspace with five crates, each handling a distinct concern. The crates form an acyclic dependency graph with `gitcoin-core` at the root:
+GitGold's core library is organized as a Cargo workspace with five crates, each handling a distinct concern. The crates form an acyclic dependency graph with `GitGold-core` at the root:
 
 ```
-                    gitcoin-core
+                    GitGold-core
                    /      |      \
-          gitcoin-crypto  |   gitcoin-storage
+          GitGold-crypto  |   GitGold-storage
                 |    \    |    /
-                |  gitcoin-ledger
+                |  GitGold-ledger
                 |    /
-          gitcoin-challenge
+          GitGold-challenge
 ```
 
 Data flows through the system as follows:
@@ -76,19 +76,19 @@ Ledger (append-only transaction log with Merkle proofs)
 
 ## Crates
 
-### gitcoin-core
+### GitGold-core
 
 Foundation types shared by all other crates. No business logic.
 
 | Module | Contents |
 |--------|----------|
 | `error.rs` | `ShamirError`, `StorageError`, `LedgerError`, `ChallengeError` (via `thiserror`) |
-| `types.rs` | `Hash256 = [u8; 32]`, `Address(String)`, `MicroGitCoin = u64`, `TransactionType` enum |
-| `config.rs` | `GitCoinConfig` with all whitepaper defaults (k=5, n=9, 512KB chunks, fee rates, supply parameters) |
+| `types.rs` | `Hash256 = [u8; 32]`, `Address(String)`, `MicroGitGold = u64`, `TransactionType` enum |
+| `config.rs` | `GitGoldConfig` with all whitepaper defaults (k=5, n=9, 512KB chunks, fee rates, supply parameters) |
 
-`MicroGitCoin` uses integer arithmetic throughout (1 GC = 1,000,000 micro-GC) to avoid floating-point precision issues in financial calculations.
+`MicroGitGold` uses integer arithmetic throughout (1 GC = 1,000,000 micro-GC) to avoid floating-point precision issues in financial calculations.
 
-### gitcoin-crypto
+### GitGold-crypto
 
 Cryptographic primitives: finite field arithmetic, secret sharing, hashing, and digital signatures.
 
@@ -105,7 +105,7 @@ Cryptographic primitives: finite field arithmetic, secret sharing, hashing, and 
 - Any k-of-n subset reconstructs the original — no specific shares are privileged
 - The 256-bit prime field provides cryptographic-strength security
 
-### gitcoin-storage
+### GitGold-storage
 
 Fragment persistence using SQLite, with data chunking utilities.
 
@@ -117,7 +117,7 @@ Fragment persistence using SQLite, with data chunking utilities.
 
 Fragment records include a SHA-256 hash of the stored data (`data_hash`) and timestamps for storage and last challenge, enabling integrity verification and staleness detection.
 
-### gitcoin-ledger
+### GitGold-ledger
 
 Token economics: an append-only transaction ledger with Merkle tree verification, balance tracking, and supply management.
 
@@ -135,7 +135,7 @@ Token economics: an append-only transaction ledger with Merkle tree verification
 - Deduplicated: a transaction ID can only appear once
 - Auditable: Merkle inclusion proofs verify any transaction belongs to the ledger
 
-### gitcoin-challenge
+### GitGold-challenge
 
 Proof-of-availability: challenge generation, proof construction, and validation with reward computation.
 
@@ -205,14 +205,14 @@ Speed bonus rewards fast responses: a node responding in 100ms to a 30s-timeout 
 
 ### Token Economics
 
-The GitCoin token uses a deflationary model:
+The GitGold token uses a deflationary model:
 
 - **Initial supply**: 100,000,000 GC
 - **Emission**: 2% annual, decreasing 0.1% per year (reaches 0% at year 20)
 - **Burns**: 10% of push fees, 5% of pull fees are permanently destroyed
 - **Transaction types**: PushFee, PullFee, StorageReward, ChallengeReward, BandwidthReward, Transfer, Burn, Mint
 
-All amounts are tracked as `MicroGitCoin` (u64), where 1 GC = 1,000,000 micro-GC, ensuring lossless integer arithmetic.
+All amounts are tracked as `MicroGitGold` (u64), where 1 GC = 1,000,000 micro-GC, ensuring lossless integer arithmetic.
 
 ---
 
@@ -226,8 +226,8 @@ All amounts are tracked as `MicroGitCoin` (u64), where 1 GC = 1,000,000 micro-GC
 ### Build
 
 ```bash
-git clone https://github.com/crussella0129/GitCoin.git
-cd GitCoin
+git clone https://github.com/crussella0129/GitGold.git
+cd GitGold
 cargo build
 ```
 
@@ -238,7 +238,7 @@ cargo build
 cargo test
 
 # Run tests for a specific crate
-cargo test -p gitcoin-crypto
+cargo test -p GitGold-crypto
 
 # Run a specific test
 cargo test test_shamir_any_subset
@@ -257,7 +257,7 @@ cargo clippy --all-targets
 
 ## Configuration Defaults
 
-All whitepaper parameters are centralized in `GitCoinConfig::default()`:
+All whitepaper parameters are centralized in `GitGoldConfig::default()`:
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
@@ -282,19 +282,19 @@ All whitepaper parameters are centralized in `GitCoinConfig::default()`:
 ## Dependency Graph
 
 ```
-gitcoin-core           (no internal deps)
+GitGold-core           (no internal deps)
   ^
   |
-gitcoin-crypto         (depends on: core)
+GitGold-crypto         (depends on: core)
   ^           ^
   |            \
-gitcoin-storage \      (depends on: core, crypto)
+GitGold-storage \      (depends on: core, crypto)
   ^              |
   |              |
-gitcoin-ledger   |     (depends on: core, crypto)
+GitGold-ledger   |     (depends on: core, crypto)
   ^              |
   |             /
-gitcoin-challenge      (depends on: core, crypto, storage, ledger)
+GitGold-challenge      (depends on: core, crypto, storage, ledger)
 ```
 
 No circular dependencies. Each crate can be compiled and tested independently.
@@ -362,23 +362,23 @@ Cross-crate workflows in `tests/integration_test.rs`:
 ## Project Structure
 
 ```
-GitCoin/
+GitGold/
 ├── Cargo.toml                          # Workspace manifest + root package
-├── GitCoin.txt                         # Whitepaper
+├── GitGold.txt                         # Whitepaper
 ├── README.md                           # This file
 ├── src/
 │   └── lib.rs                          # Root crate re-exports
 ├── tests/
 │   └── integration_test.rs             # Cross-crate integration tests
 └── crates/
-    ├── gitcoin-core/
+    ├── GitGold-core/
     │   ├── Cargo.toml
     │   └── src/
     │       ├── lib.rs
     │       ├── error.rs                # Error types (thiserror)
-    │       ├── types.rs                # Hash256, Address, MicroGitCoin, TransactionType
-    │       └── config.rs               # GitCoinConfig with whitepaper defaults
-    ├── gitcoin-crypto/
+    │       ├── types.rs                # Hash256, Address, MicroGitGold, TransactionType
+    │       └── config.rs               # GitGoldConfig with whitepaper defaults
+    ├── GitGold-crypto/
     │   ├── Cargo.toml
     │   └── src/
     │       ├── lib.rs
@@ -387,14 +387,14 @@ GitCoin/
     │       ├── hash.rs                 # SHA-256 convenience wrappers
     │       ├── keys.rs                 # Ed25519 key pair + address derivation
     │       └── wallet.rs               # Wallet (KeyPair wrapper)
-    ├── gitcoin-storage/
+    ├── GitGold-storage/
     │   ├── Cargo.toml
     │   └── src/
     │       ├── lib.rs
     │       ├── chunk.rs                # Data chunking + reassembly
     │       ├── schema.rs               # SQLite schema initialization
     │       └── db.rs                   # FragmentStore (CRUD + challenge recording)
-    ├── gitcoin-ledger/
+    ├── GitGold-ledger/
     │   ├── Cargo.toml
     │   └── src/
     │       ├── lib.rs
@@ -403,7 +403,7 @@ GitCoin/
     │       ├── balance.rs              # BalanceTracker (credit/debit/transfer)
     │       ├── supply.rs               # SupplyTracker (emission + burn model)
     │       └── store.rs                # Ledger (SQLite-backed, replay-on-open)
-    └── gitcoin-challenge/
+    └── GitGold-challenge/
         ├── Cargo.toml
         └── src/
             ├── lib.rs
@@ -447,4 +447,4 @@ GitCoin/
 
 ## License
 
-MIT License. See the [whitepaper](GitCoin.txt) (CC BY-SA 4.0) for the protocol specification.
+MIT License. See the [whitepaper](GitGold.txt) (CC BY-SA 4.0) for the protocol specification.
